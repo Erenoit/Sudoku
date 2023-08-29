@@ -11,6 +11,7 @@ project "Sudoku"
   kind "WindowedApp"
   language "C++"
   targetdir "bin/%{cfg.buildcfg}"
+  buildoptions { "-Wall", "-Wextra", "-Wpedantic" }
 
   externalincludedirs { "lib/glad/include", "lib/glm" }
 
