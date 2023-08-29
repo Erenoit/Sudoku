@@ -5,6 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#include "shader.hpp"
+
 #define START_WIDTH  800
 #define START_HEIGHT 600
 
@@ -63,6 +65,8 @@ int main() {
     }
 
     glViewport(0, 0, START_WIDTH, START_HEIGHT);
+
+    Shader standard_shader("assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
