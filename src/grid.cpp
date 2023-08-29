@@ -4,6 +4,7 @@ Grid::Grid(Shader shader, int width, int height): shader(shader), width(width), 
     this->generateVertices();
     this->generateIndices();
 
+    this->updateModel();
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -34,6 +35,12 @@ void Grid::draw(glm::vec4 color) const {
     this->shader.setUniform("model", this->model);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 3 * 2 * 8 * 2, GL_UNSIGNED_INT, 0);
+}
+
+void Grid::updateSize(int width, int height) {
+    this->width = width;
+    this->height = height;
+    this->updateModel();
 }
 
 void Grid::generateVertices() {
@@ -88,8 +95,16 @@ void Grid::generateIndices() {
         this->indices[i * 6 + 4] = i * 4 + 2;
         this->indices[i * 6 + 5] = i * 4 + 3;
     }
+}
 
+void Grid::updateModel() {
+    glm::vec3 scale;
+    if (this->height > this->width) {
+        scale = glm::vec3(1.0f, (float)this->width / this->height, 1.0f);
+    } else {
+        scale = glm::vec3((float)this->height / this->width, 1.0f, 1.0f);
     }
 
+    this->model = glm::scale(glm::mat4(1.0f), scale);
 }
 

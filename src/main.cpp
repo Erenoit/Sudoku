@@ -17,6 +17,8 @@ static glm::vec4 secondary  = glm::vec4(0xC5 / 255.0f, 0xC0 / 255.0f, 0x97 / 255
 static glm::vec4 yellow     = glm::vec4(0xF6 / 255.0f, 0xCE / 255.0f, 0x6B / 255.0f, 1.0f);
 static glm::vec4 red        = glm::vec4(0xC7 / 255.0f, 0x2F / 255.0f, 0x28 / 255.0f, 1.0f);
 
+Grid *g;
+
 static void error_callback(int error, const char* description) {
     std::cerr << " GLFW Error(" << error << "): " << description << std::endl;
 }
@@ -31,6 +33,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 static void screen_size_change_callback(GLFWwindow *window, int width, int height) {
     (void)window;
     glViewport(0, 0, width, height);
+    if (g != nullptr) {
+        g->updateSize(width, height);
+    }
 }
 
 int main() {
@@ -69,7 +74,8 @@ int main() {
 
     Shader standard_shader("assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
 
-    Grid grid(standard_shader, 0, 0);
+    Grid grid(standard_shader, START_WIDTH, START_HEIGHT);
+    g = &grid;
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();

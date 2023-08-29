@@ -32,6 +32,7 @@ private:
     // TODO: Generate them at compile time
     void generateVertices();
     void generateIndices();
+    void updateModel();
 };
 
 #endif // GRID_HPP
