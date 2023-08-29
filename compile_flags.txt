@@ -1,0 +1,6 @@
+-std=c++11
+-Wall
+-Wextra
+-Wpedantic
+-I./lib/glad/include
+-I./lib/glm
