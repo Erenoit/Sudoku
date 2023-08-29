@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "shader.hpp"
+#include "grid.hpp"
 
 #define START_WIDTH  800
 #define START_HEIGHT 600
@@ -68,6 +69,8 @@ int main() {
 
     Shader standard_shader("assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
 
+    Grid grid(standard_shader, 0, 0);
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
@@ -76,6 +79,8 @@ int main() {
         glViewport(0, 0, display_w, display_h);
         glClearColor(background[0], background[1], background[2], background[3]);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        grid.draw(primary);
 
         glfwSwapBuffers(window);
     }
