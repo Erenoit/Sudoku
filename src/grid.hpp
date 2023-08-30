@@ -23,8 +23,8 @@ private:
     const float thin_thickness  = 0.005f;
     const float thick_thickness = 0.012f;
     unsigned int VAO, VBO, EBO;
-    float vertices[3 * 4 * 8 * 2];
-    unsigned int indices[3* 2 * 8 * 2];
+    float vertices[2 * 4 * 8 * 2];
+    unsigned int indices[3 * 2 * 8 * 2];
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);

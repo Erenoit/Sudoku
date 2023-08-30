@@ -13,7 +13,7 @@ Grid::Grid(Shader shader, int width, int height): shader(shader), width(width), 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
@@ -57,32 +57,24 @@ void Grid::generateVertices() {
         }
 
         // Horizontal line
-        this->vertices[i * 24 +  0] = line_coordinates_1d[i] - half_thickness;
-        this->vertices[i * 24 +  1] = 1.0f;
-        this->vertices[i * 24 +  2] = 0.0f;
-        this->vertices[i * 24 +  3] = line_coordinates_1d[i] - half_thickness;
-        this->vertices[i * 24 +  4] = -1.0f;
-        this->vertices[i * 24 +  5] = 0.0f;
-        this->vertices[i * 24 +  6] = line_coordinates_1d[i] + half_thickness;
-        this->vertices[i * 24 +  7] = 1.0f;
-        this->vertices[i * 24 +  8] = 0.0f;
-        this->vertices[i * 24 +  9] = line_coordinates_1d[i] + half_thickness;
-        this->vertices[i * 24 + 10] = -1.0f;
-        this->vertices[i * 24 + 11] = 0.0f;
+        this->vertices[i * 16 +  0] = line_coordinates_1d[i] - half_thickness;
+        this->vertices[i * 16 +  1] = 1.0f;
+        this->vertices[i * 16 +  2] = line_coordinates_1d[i] - half_thickness;
+        this->vertices[i * 16 +  3] = -1.0f;
+        this->vertices[i * 16 +  4] = line_coordinates_1d[i] + half_thickness;
+        this->vertices[i * 16 +  5] = 1.0f;
+        this->vertices[i * 16 +  6] = line_coordinates_1d[i] + half_thickness;
+        this->vertices[i * 16 +  7] = -1.0f;
 
         // Vertical line
-        this->vertices[i * 24 + 12] = 1.0f;
-        this->vertices[i * 24 + 13] = line_coordinates_1d[i] - half_thickness;
-        this->vertices[i * 24 + 14] = 0.0f;
-        this->vertices[i * 24 + 15] = -1.0f;
-        this->vertices[i * 24 + 16] = line_coordinates_1d[i] - half_thickness;
-        this->vertices[i * 24 + 17] = 0.0f;
-        this->vertices[i * 24 + 18] = 1.0f;
-        this->vertices[i * 24 + 19] = line_coordinates_1d[i] + half_thickness;
-        this->vertices[i * 24 + 20] = 0.0f;
-        this->vertices[i * 24 + 21] = -1.0f;
-        this->vertices[i * 24 + 22] = line_coordinates_1d[i] + half_thickness;
-        this->vertices[i * 24 + 23] = 0.0f;
+        this->vertices[i * 16 +  8] = 1.0f;
+        this->vertices[i * 16 +  9] = line_coordinates_1d[i] - half_thickness;
+        this->vertices[i * 16 + 10] = -1.0f;
+        this->vertices[i * 16 + 11] = line_coordinates_1d[i] - half_thickness;
+        this->vertices[i * 16 + 12] = 1.0f;
+        this->vertices[i * 16 + 13] = line_coordinates_1d[i] + half_thickness;
+        this->vertices[i * 16 + 14] = -1.0f;
+        this->vertices[i * 16 + 15] = line_coordinates_1d[i] + half_thickness;
     }
 }
 
