@@ -45,6 +45,7 @@ int main() {
         return -1;
     }
 
+    glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing (MSAA
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -70,6 +71,7 @@ int main() {
         return -1;
     }
 
+    glEnable(GL_MULTISAMPLE);
     glViewport(0, 0, START_WIDTH, START_HEIGHT);
 
     Shader standard_shader("assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
