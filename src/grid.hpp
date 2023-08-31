@@ -11,7 +11,7 @@
 
 class Grid {
 public:
-    Grid(const Shader shader, int width, int height);
+    Grid(int width, int height);
     ~Grid();
 
     void draw(glm::vec4 color) const;
@@ -19,7 +19,6 @@ public:
 
 private:
     int width, height;
-    const Shader shader;
     const float thin_thickness  = 0.005f;
     const float thick_thickness = 0.012f;
 

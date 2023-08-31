@@ -11,7 +11,8 @@
 
 class Shader {
 public:
-    Shader(const char* vertexPath, const char* fragmentPath);
+    Shader(const char* vertex_code, const char* fragment_code, const char* geometry_code = nullptr);
+    ~Shader();
 
     void use() const;
 

@@ -1,6 +1,7 @@
 #include "grid.hpp"
+#include "resource_manager.hpp"
 
-Grid::Grid(Shader shader, int width, int height): shader(shader), width(width), height(height) {
+Grid::Grid(int width, int height) : width(width), height(height) {
     this->updateModel();
 
     glGenVertexArrays(1, &VAO);
@@ -25,13 +26,16 @@ Grid::~Grid() {
 }
 
 void Grid::draw(glm::vec4 color) const {
-    this->shader.use();
-    this->shader.setUniform("color", color);
-    this->shader.setUniform("projection", this->projection);
-    this->shader.setUniform("view", this->view);
-    this->shader.setUniform("model", this->model);
+    Shader *shader = ResourceManager::getShader("standard_shader");
+    shader->use();
+    shader->setUniform("color", color);
+    shader->setUniform("projection", this->projection);
+    shader->setUniform("view", this->view);
+    shader->setUniform("model", this->model);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 3 * 2 * 8 * 2, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
 }
 
 void Grid::updateSize(int width, int height) {

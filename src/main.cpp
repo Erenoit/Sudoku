@@ -7,6 +7,7 @@
 
 #include "shader.hpp"
 #include "grid.hpp"
+#include "resource_manager.hpp"
 
 #define START_WIDTH  800
 #define START_HEIGHT 600
@@ -74,9 +75,9 @@ int main() {
     glEnable(GL_MULTISAMPLE);
     glViewport(0, 0, START_WIDTH, START_HEIGHT);
 
-    Shader standard_shader("assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
+    ResourceManager::loadShader("standard_shader", "assets/shaders/standard_vertex.glsl", "assets/shaders/standard_fragment.glsl");
 
-    Grid grid(standard_shader, START_WIDTH, START_HEIGHT);
+    Grid grid = *new Grid(START_WIDTH, START_HEIGHT);
     g = &grid;
 
     while (!glfwWindowShouldClose(window)) {
@@ -93,6 +94,7 @@ int main() {
         glfwSwapBuffers(window);
     }
 
+    ResourceManager::clear();
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
