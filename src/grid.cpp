@@ -26,7 +26,7 @@ Grid::~Grid() {
 }
 
 void Grid::draw(glm::vec4 color) const {
-    Shader *shader = ResourceManager::getShader("standard_shader");
+    auto shader = ResourceManager::getShader("standard_shader");
     shader->use();
     shader->setUniform("color", color);
     shader->setUniform("projection", this->projection);
