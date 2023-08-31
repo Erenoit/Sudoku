@@ -111,9 +111,41 @@ void Grid::updateModel() {
 }
 
 void:: Grid::updateSelected() {
-    // TODO: looks closer to the thick lines
-    glm::vec3 scale = glm::vec3(1.0f / 9.0f - 0.01f, 1.0f / 9.0f - 0.01f, 1.0f);
-    glm::vec3 position = glm::vec3(-(1 - 0.12f - (this->selected % 9) * 0.22), (1 - 0.12f - (this->selected / 9) * 0.22), 0.0f);
+    // thick line margin fix size/position x and y
+    float tlmfsx, tlmfsy, tlmfpx, tlmfpy;
+    const float margin = 0.01f, cell_offset = 0.12f, cell_size = 0.22f;
+    const float thickness_diff_half = (this->thick_thickness - this->thin_thickness) / 2;
+
+    if (selected % 3 == 1) {
+        tlmfsx = 0.0f;
+        tlmfpx = 0.0f;
+    } else if (selected % 3 == 2) {
+        tlmfsx = thickness_diff_half;
+        tlmfpx = -thickness_diff_half / 2;
+    } else {
+        tlmfsx = thickness_diff_half;
+        tlmfpx = thickness_diff_half / 2;
+    }
+
+    if ((selected / 9) % 3 == 1) {
+        tlmfsy = 0.0f;
+        tlmfpy = 0.0f;
+    } else if ((selected / 9) % 3 == 2) {
+        tlmfsy = thickness_diff_half;
+        tlmfpy = -thickness_diff_half / 2;
+    } else {
+        tlmfsy = thickness_diff_half;
+        tlmfpy = thickness_diff_half / 2;
+    }
+
+    glm::vec3 scale = glm::vec3(
+            1.0f / 9.0f - margin - tlmfsx,
+            1.0f / 9.0f - margin - tlmfsy,
+            1.0f);
+    glm::vec3 position = glm::vec3(
+            -(1 - cell_offset - (this->selected % 9) * cell_size - tlmfpx),
+             (1 - cell_offset - (this->selected / 9) * cell_size - tlmfpy),
+             0.0f);
 
     sb.updateModel(this->model * glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale));
 }
