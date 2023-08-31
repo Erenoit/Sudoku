@@ -5,47 +5,29 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "shader.hpp"
-#include "grid.hpp"
+#include "game.hpp"
 #include "resource_manager.hpp"
 
 #define START_WIDTH  800
 #define START_HEIGHT 600
 
-static glm::vec4 background = glm::vec4(0x2D / 255.0f, 0x51 / 266.0f, 0x59 / 255.0f, 1.0f);
-static glm::vec4 primary    = glm::vec4(0x48 / 255.0f, 0x7D / 255.0f, 0x67 / 255.0f, 1.0f);
-static glm::vec4 secondary  = glm::vec4(0xC5 / 255.0f, 0xC0 / 255.0f, 0x97 / 255.0f, 1.0f);
-static glm::vec4 yellow     = glm::vec4(0xF6 / 255.0f, 0xCE / 255.0f, 0x6B / 255.0f, 1.0f);
-static glm::vec4 red        = glm::vec4(0xC7 / 255.0f, 0x2F / 255.0f, 0x28 / 255.0f, 1.0f);
-
-Grid *g;
+Game game(START_WIDTH, START_HEIGHT);
 
 static void error_callback(int error, const char* description) {
     std::cerr << " GLFW Error(" << error << "): " << description << std::endl;
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    else if (g != nullptr && action & (GLFW_PRESS | GLFW_REPEAT))
-            switch (key) {
-                case GLFW_KEY_UP:    g->goUp();    break;
-                case GLFW_KEY_DOWN:  g->goDown();  break;
-                case GLFW_KEY_LEFT:  g->goLeft();  break;
-                case GLFW_KEY_RIGHT: g->goRight(); break;
-                default:
-                    std::cout << "Key: " << key << " Scancode: " << scancode << " Action: " << action << " Mods: " << mods << std::endl;
-                    break;
-            }
-
-}
-
 static void screen_size_change_callback(GLFWwindow *window, int width, int height) {
     (void)window;
     glViewport(0, 0, width, height);
-    if (g != nullptr) {
-        g->updateSize(width, height);
-    }
+    game.updateScreenSize(width, height);
+}
+
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode) {
+    (void)window;
+    (void)scancode;
+    (void)mode;
+    game.processInput(key, action);
 }
 
 int main() {
@@ -86,21 +68,17 @@ int main() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glViewport(0, 0, START_WIDTH, START_HEIGHT);
 
-    ResourceManager::loadShader("standard_shader", "assets/shaders/standard_vertex.glsl", "assets/shaders/standard_fragment.glsl");
-
-    Grid grid = *new Grid(START_WIDTH, START_HEIGHT);
-    g = &grid;
+    game.init();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-        glClearColor(background[0], background[1], background[2], background[3]);
-        glClear(GL_COLOR_BUFFER_BIT);
+        game.update();
 
-        grid.draw(primary);
+        glm::vec4 background = game.getBackground();
+        glClearColor(background.r, background.g, background.b, background.a);
+        glClear(GL_COLOR_BUFFER_BIT);
+        game.draw();
 
         glfwSwapBuffers(window);
     }

@@ -1,9 +1,8 @@
 #include "grid.hpp"
+
 #include "resource_manager.hpp"
 
-Grid::Grid(int width, int height) : width(width), height(height) {
-    this->updateModel();
-
+Grid::Grid() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -25,24 +24,16 @@ Grid::~Grid() {
     glDeleteBuffers(1, &EBO);
 }
 
-void Grid::draw(glm::vec4 color) const {
+void Grid::draw(const Camera *camera, const glm::vec4 &color) const {
     auto shader = ResourceManager::getShader("standard_shader");
     shader->use();
     shader->setUniform("color", color);
-    shader->setUniform("projection", this->projection);
-    shader->setUniform("view", this->view);
+    shader->setUniform("projection", camera->getProjection());
+    shader->setUniform("view", camera->getView());
     shader->setUniform("model", this->model);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 3 * 2 * 8 * 2, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-
-    this->sb.draw(glm::vec4(0xC5 / 255.0f, 0xC0 / 255.0f, 0x97 / 255.0f, 0.5f));
-}
-
-void Grid::updateSize(int width, int height) {
-    this->width = width;
-    this->height = height;
-    this->updateModel();
 }
 
 constexpr std::array<float, 2 * 4 * 8 * 2> Grid::generateVertices() const {
@@ -96,76 +87,4 @@ constexpr std::array<unsigned int, 3 * 2 * 8 * 2> Grid::generateIndices() const 
     }
 
     return result;
-}
-
-void Grid::updateModel() {
-    glm::vec3 scale;
-    if (this->height > this->width) {
-        scale = glm::vec3(1.0f, (float)this->width / this->height, 1.0f);
-    } else {
-        scale = glm::vec3((float)this->height / this->width, 1.0f, 1.0f);
-    }
-
-    this->model = glm::scale(glm::mat4(1.0f), scale);
-    this->updateSelected();
-}
-
-void:: Grid::updateSelected() {
-    // thick line margin fix size/position x and y
-    float tlmfsx, tlmfsy, tlmfpx, tlmfpy;
-    const float margin = 0.01f, cell_offset = 0.12f, cell_size = 0.22f;
-    const float thickness_diff_half = (this->thick_thickness - this->thin_thickness) / 2;
-
-    if (selected % 3 == 1) {
-        tlmfsx = 0.0f;
-        tlmfpx = 0.0f;
-    } else if (selected % 3 == 2) {
-        tlmfsx = thickness_diff_half;
-        tlmfpx = -thickness_diff_half / 2;
-    } else {
-        tlmfsx = thickness_diff_half;
-        tlmfpx = thickness_diff_half / 2;
-    }
-
-    if ((selected / 9) % 3 == 1) {
-        tlmfsy = 0.0f;
-        tlmfpy = 0.0f;
-    } else if ((selected / 9) % 3 == 2) {
-        tlmfsy = thickness_diff_half;
-        tlmfpy = -thickness_diff_half / 2;
-    } else {
-        tlmfsy = thickness_diff_half;
-        tlmfpy = thickness_diff_half / 2;
-    }
-
-    glm::vec3 scale = glm::vec3(
-            1.0f / 9.0f - margin - tlmfsx,
-            1.0f / 9.0f - margin - tlmfsy,
-            1.0f);
-    glm::vec3 position = glm::vec3(
-            -(1 - cell_offset - (this->selected % 9) * cell_size - tlmfpx),
-             (1 - cell_offset - (this->selected / 9) * cell_size - tlmfpy),
-             0.0f);
-
-    sb.updateModel(this->model * glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale));
-}
-
-void Grid::goUp() { 
-    this->selected = (this->selected - 9 + 81) % 81;
-    this->updateModel();
-}
-
-void Grid::goDown() { 
-    this->selected = (this->selected + 9) % 81;
-    this->updateModel();
-}
-
-void Grid::goLeft() {
-    this->selected = this->selected - (this->selected % 9) + (this->selected + 8) % 9;
-    this->updateModel();
-}
-
-void Grid::goRight() {
-    this->selected = this->selected - (this->selected % 9) + (this->selected + 1) % 9;
-    this->updateModel();
 }

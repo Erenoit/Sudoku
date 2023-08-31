@@ -1,7 +1,12 @@
 #include "selection_box.hpp"
+
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "resource_manager.hpp"
 
 SelectionBox::SelectionBox() {
+    this->updateModel(0);
+
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -23,19 +28,17 @@ SelectionBox::~SelectionBox() {
     glDeleteBuffers(1, &EBO);
 }
 
-void SelectionBox::draw(glm::vec4 color) const {
+void SelectionBox::draw(const Camera *camera, const glm::vec4 &color) const {
     auto shader = ResourceManager::getShader("standard_shader");
     shader->use();
-    shader->setUniform("color", color);
-    shader->setUniform("projection", this->projection);
-    shader->setUniform("view", this->view);
+    shader->setUniform("color", glm::vec4((glm::vec3)color, 0.5f));
+    shader->setUniform("projection", camera->getProjection());
+    shader->setUniform("view", camera->getView());
     shader->setUniform("model", this->model);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 3 * (SAMPLES - 1 + 2) * 4 + 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
-
-void SelectionBox::updateModel(glm::mat4 model) { this->model = model; }
 
 constexpr std::array<float, 2 * (SAMPLES + 1) * 4> SelectionBox::generateVertices() const {
     std::array<float, 2 * (SAMPLES + 1) * 4> result;
@@ -94,4 +97,45 @@ constexpr std::array<unsigned int, 3 * (SAMPLES - 1 + 2) * 4 + 6> SelectionBox::
     }
 
     return result;
+}
+
+void SelectionBox::updateModel(const int grid_position) {
+        // thick line margin fix size/position x and y
+    float tlmfsx, tlmfsy, tlmfpx, tlmfpy;
+    const float margin = 0.01f, cell_offset = 0.12f, cell_size = 0.22f;
+    //const float thickness_diff_half = (this->thick_thickness - this->thin_thickness) / 2;
+    const float thickness_diff_half = (0.012 - 0.005) / 2;
+
+    if (grid_position % 3 == 1) {
+        tlmfsx = 0.0f;
+        tlmfpx = 0.0f;
+    } else if (grid_position % 3 == 2) {
+        tlmfsx = thickness_diff_half;
+        tlmfpx = -thickness_diff_half / 2;
+    } else {
+        tlmfsx = thickness_diff_half;
+        tlmfpx = thickness_diff_half / 2;
+    }
+
+    if ((grid_position / 9) % 3 == 1) {
+        tlmfsy = 0.0f;
+        tlmfpy = 0.0f;
+    } else if ((grid_position / 9) % 3 == 2) {
+        tlmfsy = thickness_diff_half;
+        tlmfpy = -thickness_diff_half / 2;
+    } else {
+        tlmfsy = thickness_diff_half;
+        tlmfpy = thickness_diff_half / 2;
+    }
+
+    glm::vec3 scale = glm::vec3(
+            1.0f / 9.0f - margin - tlmfsx,
+            1.0f / 9.0f - margin - tlmfsy,
+            1.0f);
+    glm::vec3 position = glm::vec3(
+            -(1 - cell_offset - (grid_position % 9) * cell_size - tlmfpx),
+             (1 - cell_offset - (grid_position / 9) * cell_size - tlmfpy),
+             0.0f);
+
+    this->model = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale);
 }
