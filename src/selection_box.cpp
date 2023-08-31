@@ -29,7 +29,7 @@ SelectionBox::~SelectionBox() {
 }
 
 void SelectionBox::draw(const Camera *camera, const glm::vec4 &color) const {
-    auto shader = ResourceManager::getShader("standard_shader");
+    auto shader = ResourceManager::getShader("standard");
     shader->use();
     shader->setUniform("color", glm::vec4((glm::vec3)color, 0.5f));
     shader->setUniform("projection", camera->getProjection());
@@ -42,30 +42,37 @@ void SelectionBox::draw(const Camera *camera, const glm::vec4 &color) const {
 
 constexpr std::array<float, 2 * (SAMPLES + 1) * 4> SelectionBox::generateVertices() const {
     std::array<float, 2 * (SAMPLES + 1) * 4> result;
+    // clang-format off
     const float signs[] = {
         -1.0f,  1.0f,
          1.0f,  1.0f,
          1.0f, -1.0f,
         -1.0f, -1.0f,
     };
+    // clang-format on
 
     for (unsigned int i = 0; i < 4; i++) {
         const float x_sign = signs[i * 2 + 0];
         const float y_sign = signs[i * 2 + 1];
 
-        result[(SAMPLES * 2 + 2) * i + 0] = x_sign * (1.0f - radius);
-        result[(SAMPLES * 2 + 2) * i + 1] = y_sign * (1.0f - radius);
+        result[(SAMPLES * 2 + 2) * i + 0] = x_sign * (1.0f - this->radius);
+        result[(SAMPLES * 2 + 2) * i + 1] = y_sign * (1.0f - this->radius);
 
-        for (unsigned int j = 0 ; j < SAMPLES; j++) {
-            result[(SAMPLES * 2 + 2) * i + 2 + j * 2 + 0] = x_sign * (1.0f - radius + (radius * cos((float)j * M_PI / 2.0f / SAMPLES)));
-            result[(SAMPLES * 2 + 2) * i + 2 + j * 2 + 1] = y_sign * (1.0f - radius + (radius * sin((float)j * M_PI / 2.0f / SAMPLES)));
+        for (unsigned int j = 0; j < SAMPLES; j++) {
+            result[(SAMPLES * 2 + 2) * i + 2 + j * 2 + 0] =
+                x_sign
+                * (1.0f - this->radius + (this->radius * cos((float)j * M_PI / 2.0f / SAMPLES)));
+            result[(SAMPLES * 2 + 2) * i + 2 + j * 2 + 1] =
+                y_sign
+                * (1.0f - this->radius + (this->radius * sin((float)j * M_PI / 2.0f / SAMPLES)));
         }
     }
 
     return result;
 }
 
-constexpr std::array<unsigned int, 3 * (SAMPLES - 1 + 2) * 4 + 6> SelectionBox::generateIndices() const {
+constexpr std::array<unsigned int, 3 * (SAMPLES - 1 + 2) * 4 + 6>
+SelectionBox::generateIndices() const {
     std::array<unsigned int, 3 * (SAMPLES - 1 + 2) * 4 + 6> result;
 
     for (int i = 0; i < 4; i++) {
@@ -76,15 +83,15 @@ constexpr std::array<unsigned int, 3 * (SAMPLES - 1 + 2) * 4 + 6> SelectionBox::
         }
     }
 
-    result[(SAMPLES - 1) * 4 * 3 +  0] = (SAMPLES + 1) * 0;
-    result[(SAMPLES - 1) * 4 * 3 +  1] = (SAMPLES + 1) * 1;
-    result[(SAMPLES - 1) * 4 * 3 +  2] = (SAMPLES + 1) * 2;
-    result[(SAMPLES - 1) * 4 * 3 +  3] = (SAMPLES + 1) * 0;
-    result[(SAMPLES - 1) * 4 * 3 +  4] = (SAMPLES + 1) * 2;
-    result[(SAMPLES - 1) * 4 * 3 +  5] = (SAMPLES + 1) * 3;
+    result[(SAMPLES - 1) * 4 * 3 + 0] = (SAMPLES + 1) * 0;
+    result[(SAMPLES - 1) * 4 * 3 + 1] = (SAMPLES + 1) * 1;
+    result[(SAMPLES - 1) * 4 * 3 + 2] = (SAMPLES + 1) * 2;
+    result[(SAMPLES - 1) * 4 * 3 + 3] = (SAMPLES + 1) * 0;
+    result[(SAMPLES - 1) * 4 * 3 + 4] = (SAMPLES + 1) * 2;
+    result[(SAMPLES - 1) * 4 * 3 + 5] = (SAMPLES + 1) * 3;
 
     for (unsigned int i = 0; i < 4; i++) {
-        const unsigned int offset = i % 2 ? 1 : SAMPLES;
+        const unsigned int offset       = i % 2 ? 1 : SAMPLES;
         const unsigned int other_corner = (i + 1) % 4;
 
         result[(SAMPLES - 1) * 4 * 3 + (i + 1) * 6 + 0] = (SAMPLES + 1) * i;
@@ -100,10 +107,10 @@ constexpr std::array<unsigned int, 3 * (SAMPLES - 1 + 2) * 4 + 6> SelectionBox::
 }
 
 void SelectionBox::updateModel(const int grid_position) {
-        // thick line margin fix size/position x and y
+    // thick line margin fix size/position x and y
     float tlmfsx, tlmfsy, tlmfpx, tlmfpy;
     const float margin = 0.01f, cell_offset = 0.12f, cell_size = 0.22f;
-    //const float thickness_diff_half = (this->thick_thickness - this->thin_thickness) / 2;
+    // const float thickness_diff_half = (this->thick_thickness - this->thin_thickness) / 2;
     const float thickness_diff_half = (0.012 - 0.005) / 2;
 
     if (grid_position % 3 == 1) {
@@ -128,14 +135,10 @@ void SelectionBox::updateModel(const int grid_position) {
         tlmfpy = thickness_diff_half / 2;
     }
 
-    glm::vec3 scale = glm::vec3(
-            1.0f / 9.0f - margin - tlmfsx,
-            1.0f / 9.0f - margin - tlmfsy,
-            1.0f);
-    glm::vec3 position = glm::vec3(
-            -(1 - cell_offset - (grid_position % 9) * cell_size - tlmfpx),
-             (1 - cell_offset - (grid_position / 9) * cell_size - tlmfpy),
-             0.0f);
+    glm::vec3 scale = glm::vec3(1.0f / 9.0f - margin - tlmfsx, 1.0f / 9.0f - margin - tlmfsy, 1.0f);
+    glm::vec3 position = glm::vec3(-(1 - cell_offset - (grid_position % 9) * cell_size - tlmfpx),
+                                   (1 - cell_offset - (grid_position / 9) * cell_size - tlmfpy),
+                                   0.0f);
 
     this->model = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale);
 }

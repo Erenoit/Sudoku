@@ -13,10 +13,12 @@ Game::~Game() {
 }
 
 void Game::init() {
-    ResourceManager::loadShader("standard_shader", "assets/shaders/standard_vertex.glsl", "assets/shaders/standard_fragment.glsl");
+    ResourceManager::loadShader("standard",
+                                "assets/shaders/standard_vertex.glsl",
+                                "assets/shaders/standard_fragment.glsl");
 
-    this->camera = new Camera(this->width, this->height);
-    this->grid = new Grid();
+    this->camera        = new Camera(this->width, this->height);
+    this->grid          = new Grid();
     this->selection_box = new SelectionBox();
 }
 
@@ -47,11 +49,9 @@ void Game::processInput(int key, int action) {
 }
 
 void Game::updateScreenSize(int width, int height) {
-    this->width = width;
+    this->width  = width;
     this->height = height;
     this->camera->updateScreenSize(width, height);
 }
 
-const glm::vec4 &Game::getBackground() const {
-    return this->background;
-}
+const glm::vec4 &Game::getBackground() const { return this->background; }

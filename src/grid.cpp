@@ -25,7 +25,7 @@ Grid::~Grid() {
 }
 
 void Grid::draw(const Camera *camera, const glm::vec4 &color) const {
-    auto shader = ResourceManager::getShader("standard_shader");
+    auto shader = ResourceManager::getShader("standard");
     shader->use();
     shader->setUniform("color", color);
     shader->setUniform("projection", camera->getProjection());
@@ -38,9 +38,11 @@ void Grid::draw(const Camera *camera, const glm::vec4 &color) const {
 
 constexpr std::array<float, 2 * 4 * 8 * 2> Grid::generateVertices() const {
     std::array<float, 2 * 4 * 8 * 2> result;
+    // clang-format off
     const float line_coordinates_1d[8] = {
-      -0.77f, -0.55f, -0.33f, -0.11f, 0.11f, 0.33f, 0.55f, 0.77f,
+        -0.77f, -0.55f, -0.33f, -0.11f, 0.11f, 0.33f, 0.55f, 0.77f,
     };
+    // clang-format on
 
     for (size_t i = 0; i < 8; i++) {
         float half_thickness;
@@ -51,18 +53,18 @@ constexpr std::array<float, 2 * 4 * 8 * 2> Grid::generateVertices() const {
         }
 
         // Horizontal line
-        result[i * 16 +  0] = line_coordinates_1d[i] - half_thickness;
-        result[i * 16 +  1] = 0.99f;
-        result[i * 16 +  2] = line_coordinates_1d[i] - half_thickness;
-        result[i * 16 +  3] = -0.99f;
-        result[i * 16 +  4] = line_coordinates_1d[i] + half_thickness;
-        result[i * 16 +  5] = 0.99f;
-        result[i * 16 +  6] = line_coordinates_1d[i] + half_thickness;
-        result[i * 16 +  7] = -0.99f;
+        result[i * 16 + 0] = line_coordinates_1d[i] - half_thickness;
+        result[i * 16 + 1] = 0.99f;
+        result[i * 16 + 2] = line_coordinates_1d[i] - half_thickness;
+        result[i * 16 + 3] = -0.99f;
+        result[i * 16 + 4] = line_coordinates_1d[i] + half_thickness;
+        result[i * 16 + 5] = 0.99f;
+        result[i * 16 + 6] = line_coordinates_1d[i] + half_thickness;
+        result[i * 16 + 7] = -0.99f;
 
         // Vertical line
-        result[i * 16 +  8] = 0.99f;
-        result[i * 16 +  9] = line_coordinates_1d[i] - half_thickness;
+        result[i * 16 + 8]  = 0.99f;
+        result[i * 16 + 9]  = line_coordinates_1d[i] - half_thickness;
         result[i * 16 + 10] = -0.99f;
         result[i * 16 + 11] = line_coordinates_1d[i] - half_thickness;
         result[i * 16 + 12] = 0.99f;

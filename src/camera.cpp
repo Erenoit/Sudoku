@@ -7,14 +7,14 @@ Camera::Camera(int width, int height): width(width), height(height) {
     this->projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
 }
 
-Camera::~Camera() {}
+Camera::~Camera() { }
 
 const glm::mat4 &Camera::getView() const { return this->view; }
 
 const glm::mat4 &Camera::getProjection() const { return this->projection; }
 
 void Camera::updateScreenSize(int width, int height) {
-    this->width = width;
+    this->width  = width;
     this->height = height;
 
     glm::vec3 scale;

@@ -1,5 +1,5 @@
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -13,7 +13,7 @@
 
 Game game(START_WIDTH, START_HEIGHT);
 
-static void error_callback(int error, const char* description) {
+static void error_callback(int error, const char *description) {
     std::cerr << " GLFW Error(" << error << "): " << description << std::endl;
 }
 
@@ -45,7 +45,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    GLFWwindow* window = glfwCreateWindow(START_WIDTH, START_HEIGHT, "Sudoku", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(START_WIDTH, START_HEIGHT, "Sudoku", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create a window: " << strerror(errno) << std::endl;
         glfwTerminate();

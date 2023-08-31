@@ -22,7 +22,7 @@ private:
     const float radius = 0.15f;
 
     unsigned int VAO, VBO, EBO;
-    const std::array<float, 2 * (SAMPLES + 1) * 4> vertices = generateVertices();
+    const std::array<float, 2 * (SAMPLES + 1) * 4> vertices               = generateVertices();
     const std::array<unsigned int, 3 * (SAMPLES - 1 + 2) * 4 + 6> indices = generateIndices();
 
     glm::mat4 model = glm::mat4(1.0f);

@@ -2,8 +2,8 @@
 #define GAME_HPP
 
 #include "camera.hpp"
-#include "selection_box.hpp"
 #include "grid.hpp"
+#include "selection_box.hpp"
 
 class Game {
 public:

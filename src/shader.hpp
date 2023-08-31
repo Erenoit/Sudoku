@@ -1,15 +1,15 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
 class Shader {
 public:
-    Shader(const char* vertex_code, const char* fragment_code, const char* geometry_code = nullptr);
+    Shader(const char *vertex_code, const char *fragment_code, const char *geometry_code = nullptr);
     ~Shader();
 
     void use() const;
