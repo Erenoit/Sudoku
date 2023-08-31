@@ -1,7 +1,7 @@
 #ifndef GRID_HPP
 #define GRID_HPP
 
-#include <vector>
+#include <array>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -22,16 +22,17 @@ private:
     const Shader shader;
     const float thin_thickness  = 0.005f;
     const float thick_thickness = 0.012f;
+
     unsigned int VAO, VBO, EBO;
-    float vertices[2 * 4 * 8 * 2];
-    unsigned int indices[3 * 2 * 8 * 2];
+    const std::array<float, 2 * 4 * 8 * 2> vertices       = generateVertices();
+    const std::array<unsigned int, 3 * 2 * 8 * 2> indices = generateIndices();
+
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f);
 
-    // TODO: Generate them at compile time
-    void generateVertices();
-    void generateIndices();
+    constexpr std::array<float, 2 * 4 * 8 * 2> generateVertices() const;
+    constexpr std::array<unsigned int, 3 * 2 * 8 * 2> generateIndices() const;
     void updateModel();
 };
 
