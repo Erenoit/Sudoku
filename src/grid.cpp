@@ -36,6 +36,7 @@ void Grid::draw(glm::vec4 color) const {
     glDrawElements(GL_TRIANGLES, 3 * 2 * 8 * 2, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
+    this->sb.draw(glm::vec4(0xC5 / 255.0f, 0xC0 / 255.0f, 0x97 / 255.0f, 0.5f));
 }
 
 void Grid::updateSize(int width, int height) {
@@ -60,22 +61,22 @@ constexpr std::array<float, 2 * 4 * 8 * 2> Grid::generateVertices() const {
 
         // Horizontal line
         result[i * 16 +  0] = line_coordinates_1d[i] - half_thickness;
-        result[i * 16 +  1] = 1.0f;
+        result[i * 16 +  1] = 0.99f;
         result[i * 16 +  2] = line_coordinates_1d[i] - half_thickness;
-        result[i * 16 +  3] = -1.0f;
+        result[i * 16 +  3] = -0.99f;
         result[i * 16 +  4] = line_coordinates_1d[i] + half_thickness;
-        result[i * 16 +  5] = 1.0f;
+        result[i * 16 +  5] = 0.99f;
         result[i * 16 +  6] = line_coordinates_1d[i] + half_thickness;
-        result[i * 16 +  7] = -1.0f;
+        result[i * 16 +  7] = -0.99f;
 
         // Vertical line
-        result[i * 16 +  8] = 1.0f;
+        result[i * 16 +  8] = 0.99f;
         result[i * 16 +  9] = line_coordinates_1d[i] - half_thickness;
-        result[i * 16 + 10] = -1.0f;
+        result[i * 16 + 10] = -0.99f;
         result[i * 16 + 11] = line_coordinates_1d[i] - half_thickness;
-        result[i * 16 + 12] = 1.0f;
+        result[i * 16 + 12] = 0.99f;
         result[i * 16 + 13] = line_coordinates_1d[i] + half_thickness;
-        result[i * 16 + 14] = -1.0f;
+        result[i * 16 + 14] = -0.99f;
         result[i * 16 + 15] = line_coordinates_1d[i] + half_thickness;
     }
 
@@ -106,5 +107,33 @@ void Grid::updateModel() {
     }
 
     this->model = glm::scale(glm::mat4(1.0f), scale);
+    this->updateSelected();
 }
 
+void:: Grid::updateSelected() {
+    // TODO: looks closer to the thick lines
+    glm::vec3 scale = glm::vec3(1.0f / 9.0f - 0.01f, 1.0f / 9.0f - 0.01f, 1.0f);
+    glm::vec3 position = glm::vec3(-(1 - 0.12f - (this->selected % 9) * 0.22), (1 - 0.12f - (this->selected / 9) * 0.22), 0.0f);
+
+    sb.updateModel(this->model * glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), scale));
+}
+
+void Grid::goUp() { 
+    this->selected = (this->selected - 9 + 81) % 81;
+    this->updateModel();
+}
+
+void Grid::goDown() { 
+    this->selected = (this->selected + 9) % 81;
+    this->updateModel();
+}
+
+void Grid::goLeft() {
+    this->selected = this->selected - (this->selected % 9) + (this->selected + 8) % 9;
+    this->updateModel();
+}
+
+void Grid::goRight() {
+    this->selected = this->selected - (this->selected % 9) + (this->selected + 1) % 9;
+    this->updateModel();
+}

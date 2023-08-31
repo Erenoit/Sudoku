@@ -27,8 +27,17 @@ static void error_callback(int error, const char* description) {
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-    else
-        std::cout << "Key: " << key << " Scancode: " << scancode << " Action: " << action << " Mods: " << mods << std::endl;
+    else if (g != nullptr && action & (GLFW_PRESS | GLFW_REPEAT))
+            switch (key) {
+                case GLFW_KEY_UP:    g->goUp();    break;
+                case GLFW_KEY_DOWN:  g->goDown();  break;
+                case GLFW_KEY_LEFT:  g->goLeft();  break;
+                case GLFW_KEY_RIGHT: g->goRight(); break;
+                default:
+                    std::cout << "Key: " << key << " Scancode: " << scancode << " Action: " << action << " Mods: " << mods << std::endl;
+                    break;
+            }
+
 }
 
 static void screen_size_change_callback(GLFWwindow *window, int width, int height) {
@@ -73,6 +82,8 @@ int main() {
     }
 
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glViewport(0, 0, START_WIDTH, START_HEIGHT);
 
     ResourceManager::loadShader("standard_shader", "assets/shaders/standard_vertex.glsl", "assets/shaders/standard_fragment.glsl");
