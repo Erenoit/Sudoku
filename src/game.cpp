@@ -16,6 +16,11 @@ void Game::init() {
     ResourceManager::loadShader("standard",
                                 "assets/shaders/standard_vertex.glsl",
                                 "assets/shaders/standard_fragment.glsl");
+    ResourceManager::loadShader("text",
+                                "assets/shaders/text_vertex.glsl",
+                                "assets/shaders/text_fragment.glsl");
+
+    ResourceManager::loadFont("open_sans", "assets/fonts/OpenSans-Regular.ttf", 144);
 
     this->camera        = new Camera(this->width, this->height);
     this->grid          = new Grid();

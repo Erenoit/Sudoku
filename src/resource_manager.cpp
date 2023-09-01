@@ -5,6 +5,7 @@
 #include <sstream>
 
 std::map<std::string, std::shared_ptr<Shader>> ResourceManager::shaders;
+std::map<std::string, std::shared_ptr<Font>> ResourceManager::fonts;
 
 std::shared_ptr<Shader> ResourceManager::loadShader(const std::string &name,
                                                     const char *vertex_path,
@@ -18,11 +19,19 @@ std::shared_ptr<Shader> ResourceManager::getShader(const std::string &name) {
     return shaders[name];
 }
 
+std::shared_ptr<Font> ResourceManager::loadFont(const std::string &name,
+                                                const char *font_path,
+                                                const unsigned int font_size,
+                                                const char *characters_to_load) {
+    fonts[name] = std::make_shared<Font>(font_path, font_size, characters_to_load);
+    return fonts[name];
+}
+
+std::shared_ptr<Font> ResourceManager::getFont(const std::string &name) { return fonts[name]; }
+
 void ResourceManager::clear() {
     shaders.clear();
-
-    // for (auto iter : Textures)
-    //     glDeleteTextures(1, &iter.second.ID);
+    fonts.clear();
 }
 
 std::shared_ptr<Shader> ResourceManager::loadShaderFromFile(const char *vertex_path,

@@ -13,9 +13,9 @@ project "Sudoku"
   targetdir "bin/%{cfg.buildcfg}"
   buildoptions { "-Wall", "-Wextra", "-Wpedantic" }
 
-  externalincludedirs { "lib/glad/include", "lib/glm" }
+  externalincludedirs { "lib/glad/include", "lib/glm", "/usr/include/freetype2" }
 
-  links { "glfw" }
+  links { "glfw", "freetype" }
 
   files { "src/**.hpp", "src/**.cpp", "lib/glad/src/glad.c" }
 
