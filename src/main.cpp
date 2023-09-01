@@ -80,6 +80,13 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         game.draw();
 
+#ifdef DEBUG
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR) {
+            std::cerr << "OpenGL error: " << err << std::endl;
+        }
+#endif
+
         glfwSwapBuffers(window);
     }
 
