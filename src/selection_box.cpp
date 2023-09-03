@@ -31,7 +31,7 @@ SelectionBox::~SelectionBox() {
 void SelectionBox::draw(const Camera *camera, const glm::vec4 &color) const {
     auto shader = ResourceManager::getShader("standard");
     shader->use();
-    shader->setUniform("color", glm::vec4((glm::vec3)color, 0.5f));
+    shader->setUniform("color", color);
     shader->setUniform("projection", camera->getProjection());
     shader->setUniform("view", camera->getView());
     shader->setUniform("model", this->model);

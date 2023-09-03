@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 
 #include "game.hpp"
-#include "resource_manager.hpp"
 
 #define START_WIDTH  800
 #define START_HEIGHT 600
@@ -75,7 +74,7 @@ int main() {
 
         game.update();
 
-        glm::vec4 background = game.getBackground();
+        glm::vec4 background = game.getBackgroundColor();
         glClearColor(background.r, background.g, background.b, background.a);
         glClear(GL_COLOR_BUFFER_BIT);
         game.draw();
@@ -90,7 +89,6 @@ int main() {
         glfwSwapBuffers(window);
     }
 
-    ResourceManager::clear();
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

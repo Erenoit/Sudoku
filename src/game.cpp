@@ -10,6 +10,8 @@ Game::~Game() {
     delete this->camera;
     delete this->grid;
     delete this->selection_box;
+
+    ResourceManager::clear();
 }
 
 void Game::init() {
@@ -33,8 +35,8 @@ void Game::update() {
 }
 
 void Game::draw() const {
-    this->grid->draw(this->camera, this->primary);
-    this->selection_box->draw(this->camera, this->secondary);
+    this->grid->draw(this->camera, this->grid_color);
+    this->selection_box->draw(this->camera, this->selection_color);
 }
 
 void Game::processInput(int key, int action) {
@@ -59,4 +61,4 @@ void Game::updateScreenSize(int width, int height) {
     this->camera->updateScreenSize(width, height);
 }
 
-const glm::vec4 &Game::getBackground() const { return this->background; }
+const glm::vec4 &Game::getBackgroundColor() const { return this->background_color; }

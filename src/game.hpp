@@ -15,7 +15,7 @@ public:
     void draw() const;
     void processInput(int key, int action);
     void updateScreenSize(int width, int height);
-    const glm::vec4 &getBackground() const;
+    const glm::vec4 &getBackgroundColor() const;
 
 private:
     int width, height, selected = 0;
@@ -23,11 +23,21 @@ private:
     SelectionBox *selection_box;
     Grid *grid;
 
-    const glm::vec4 background = glm::vec4(0x2D / 255.0f, 0x51 / 266.0f, 0x59 / 255.0f, 1.0f);
-    const glm::vec4 primary    = glm::vec4(0x48 / 255.0f, 0x7D / 255.0f, 0x67 / 255.0f, 1.0f);
-    const glm::vec4 secondary  = glm::vec4(0xC5 / 255.0f, 0xC0 / 255.0f, 0x97 / 255.0f, 1.0f);
-    const glm::vec4 yellow     = glm::vec4(0xF6 / 255.0f, 0xCE / 255.0f, 0x6B / 255.0f, 1.0f);
-    const glm::vec4 red        = glm::vec4(0xC7 / 255.0f, 0x2F / 255.0f, 0x28 / 255.0f, 1.0f);
+    const glm::vec4 background_color = getColor(0x16161EFF);
+    const glm::vec4 grid_color       = getColor(0x3b4261FF);
+    const glm::vec4 selection_color  = getColor(0x004CFF7F);
+    const glm::vec4 fixed_number     = getColor(0xE0AF68FF);
+    const glm::vec4 changable_number = getColor(0x7AA2F7FF);
+    const glm::vec4 error            = getColor(0xF7768EFF);
+
+    constexpr glm::vec4 getColor(int color) const {
+        const float r = ((color & 0xFF000000) >> 24) / 255.0f;
+        const float g = ((color & 0x00FF0000) >> 16) / 255.0f;
+        const float b = ((color & 0x0000FF00) >> 8) / 255.0f;
+        const float a = ((color & 0x000000FF) >> 0) / 255.0f;
+
+        return glm::vec4(r, g, b, a);
+    }
 };
 
 #endif // GAME_HPP
