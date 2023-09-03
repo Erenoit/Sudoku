@@ -1,9 +1,22 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include <array>
+
 #include "camera.hpp"
 #include "grid.hpp"
 #include "selection_box.hpp"
+
+enum NumberType {
+    NUMBER_FIXED,
+    NUMBER_CHANGABLE,
+    NUMBER_NOTE, // TODO: implement
+};
+
+struct Number {
+    NumberType type;
+    unsigned int number;
+};
 
 class Game {
 public:
@@ -19,6 +32,8 @@ public:
 
 private:
     int width, height, selected = 0;
+    std::array<Number, 9 * 9> numbers = {};
+
     Camera *camera;
     SelectionBox *selection_box;
     Grid *grid;
