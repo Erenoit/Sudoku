@@ -5,11 +5,11 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <glm/ext/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 #include "resource_manager.hpp"
 
-Font::Font(const char *font_path, const unsigned int font_size, const char *characters_to_load) {
+Font::Font(const char *font_path, const unsigned int font_size, const char *characters_to_load)
+    : size(font_size) {
     FT_Library ft;
     if (FT_Init_FreeType(&ft)) {
         std::cerr << "Failed to initialize FreeType" << std::endl;
@@ -92,15 +92,13 @@ Font::~Font() {
     this->characters.clear();
 }
 
-const Character &Font::getCharacter(const char c) const { return this->characters.at(c); }
-
+// TODO: these two functions mostly repe<t themselves.
 void Font::renderText(Camera *camera,
                       const std::string &text,
                       float x,
                       float y,
                       float scale,
-                      glm::vec4 color,
-                      bool respect_horizontal_bearing) const {
+                      glm::vec4 color) const {
     glm::mat4 position_matrix;
     glm::mat4 scale_matrix = glm::scale(glm::mat4(1.0), glm::vec3(scale));
 
@@ -114,21 +112,27 @@ void Font::renderText(Camera *camera,
     glBindVertexArray(this->VAO);
 
     for (const char c : text) {
-        const Character &ch = this->getCharacter(c);
+        const Character &ch = this->characters.at(c);
+
+        const float normalizer = 1.0f / this->size;
+
+        // TODO: 0.357639 may not work with fonts other than OpenSans well.
+        const float top    = ch.bearing.y * normalizer - 0.357639;
+        const float bottom = (ch.bearing.y - ch.size.y) * normalizer - 0.357639;
+        const float left   = -ch.size.x / 2.0f * normalizer;
+        const float right  = ch.size.x / 2.0f * normalizer;
 
         // Update position to write next character
-        position_matrix = glm::translate(glm::mat4(1.0), glm::vec3(x, y, 0.0));
+        const float x_offset = (ch.bearing.x * normalizer - left) * scale;
+        position_matrix      = glm::translate(glm::mat4(1.0), glm::vec3(x + x_offset, y, 0.0));
         shader->setUniform("model", position_matrix * scale_matrix);
-
-        float normalizer = ch.size.x > ch.size.y ? 1.0f / ch.size.x : 1.0f / ch.size.y;
-        float bearing_x  = respect_horizontal_bearing ? ch.bearing.x : 0.0f;
 
         // clang-format off
         float vertices[4 * 4] = {
-            (bearing_x - ch.size.x / 2.0f) * normalizer, (ch.bearing.y - ch.size.y / 2.0f) * normalizer, 0.0f, 0.0f,
-            (bearing_x - ch.size.x / 2.0f) * normalizer, (ch.bearing.y - ch.size.y * 1.5f) * normalizer, 0.0f, 1.0f,
-            (bearing_x + ch.size.x / 2.0f) * normalizer, (ch.bearing.y - ch.size.y * 1.5f) * normalizer, 1.0f, 1.0f,
-            (bearing_x + ch.size.x / 2.0f) * normalizer, (ch.bearing.y - ch.size.y / 2.0f) * normalizer, 1.0f, 0.0f,
+             left,    top, 0.0f, 0.0f,
+             left, bottom, 0.0f, 1.0f,
+            right, bottom, 1.0f, 1.0f,
+            right,    top, 1.0f, 0.0f,
         };
         // clang-format on
 
@@ -138,17 +142,51 @@ void Font::renderText(Camera *camera,
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-        float advance = respect_horizontal_bearing ? ch.advance >> 6 : ch.size.x;
-
-        // FIXME: Some characters are not spaced correctly. for example e has a lot of space on the
-        // right side, or l has too little space on th right side and collides with the next
-        // character. (i.e. render 'Hello,')
-        // Probably the reason is not accounting `normalizer` while calculating x for driving (not
-        // the advance one).
-        // FIXME: Also space does not work properly. (i.e. render 'Hello, World!')
-        x += advance * normalizer * scale;
+        x += (ch.advance >> 6) * normalizer * scale;
     }
 
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Font::renderChar(Camera *camera, char c, float x, float y, float scale, glm::vec4 color)
+    const {
+    const Character &ch = this->characters.at(c);
+
+    glm::mat4 position_matrix = glm::translate(glm::mat4(1.0), glm::vec3(x, y, 0.0));
+    glm::mat4 scale_matrix    = glm::scale(glm::mat4(1.0), glm::vec3(scale));
+
+    auto shader = ResourceManager::getShader("text");
+    shader->use();
+    shader->setUniform("text_color", color);
+    shader->setUniform("model", position_matrix * scale_matrix);
+    shader->setUniform("projection", camera->getProjection());
+    shader->setUniform("view", camera->getView());
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(this->VAO);
+
+    const float normalizer = 1.0f / this->size;
+
+    const float top    = ch.bearing.y * normalizer - 0.357639;
+    const float bottom = (ch.bearing.y - ch.size.y) * normalizer - 0.357639;
+    const float left   = -ch.size.x / 2.0f * normalizer;
+    const float right  = ch.size.x / 2.0f * normalizer;
+
+    // clang-format off
+        float vertices[4 * 4] = {
+             left,    top, 0.0f, 0.0f,
+             left, bottom, 0.0f, 1.0f,
+            right, bottom, 1.0f, 1.0f,
+            right,    top, 1.0f, 0.0f,
+        };
+    // clang-format on
+
+    glBindTexture(GL_TEXTURE_2D, ch.textureID);
+    glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
