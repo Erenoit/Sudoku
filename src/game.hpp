@@ -2,6 +2,8 @@
 #define GAME_HPP
 
 #include <array>
+#include <shared_mutex>
+#include <vector>
 
 #include "camera.hpp"
 #include "grid.hpp"
@@ -18,6 +20,24 @@ struct Number {
     unsigned int number;
 };
 
+enum ErrorType {
+    ERROR_ROW,
+    ERROR_COLUMN,
+    ERROR_BOX,
+};
+
+struct Error {
+    ErrorType type;
+    unsigned int index;
+    unsigned int number;
+
+    bool operator==(const Error &e) const {
+        return type == e.type && index == e.index && number == e.number;
+    }
+
+    bool operator!=(const Error &e) const { return !(*this == e); }
+};
+
 class Game {
 public:
     Game(int width, int height);
@@ -31,8 +51,23 @@ public:
     const glm::vec4 &getBackgroundColor() const;
 
 private:
-    int width, height, selected = 0;
+    int width, height;
+    unsigned int selected             = 0;
     std::array<Number, 9 * 9> numbers = {};
+    mutable std::shared_mutex error_mutex;
+    size_t error_count                  = 0;
+    std::array<Error, 3 * 9 * 9> errors = {};
+
+    unsigned int errorVAO, errorVBO, errorEBO;
+    // clang-format off
+    std::array<float, 2 * 4> error_vertices = {
+        -1.0f, -1.0f,
+        -1.0f,  1.0f,
+         1.0f,  1.0f,
+         1.0f, -1.0f,
+    };
+    std::array<unsigned int, 3 * 2> error_indices = {0, 1, 2, 2, 3, 0};
+    // clang-format on
 
     Camera *camera;
     SelectionBox *selection_box;
@@ -43,7 +78,8 @@ private:
     const glm::vec4 selection_color  = getColor(0x004CFF7F);
     const glm::vec4 fixed_number     = getColor(0xE0AF68FF);
     const glm::vec4 changable_number = getColor(0x7AA2F7FF);
-    const glm::vec4 error            = getColor(0xF7768EFF);
+    // const glm::vec4 error            = getColor(0xF7768EFF);
+    const glm::vec4 error            = getColor(0x874656FF);
 
     constexpr glm::vec4 getColor(int color) const {
         const float r = ((color & 0xFF000000) >> 24) / 255.0f;
@@ -53,6 +89,12 @@ private:
 
         return glm::vec4(r, g, b, a);
     }
+
+    void updateErrors();
+    unsigned int checkRow(unsigned int row) const;
+    unsigned int checkColumn(unsigned int column) const;
+    unsigned int checkBox(unsigned int box) const;
+    void drawErrors() const;
 };
 
 #endif // GAME_HPP
